@@ -1,3 +1,8 @@
+// zod-v3.24.2およびhono-v4.7.4では以下のエラーが出るが、実行には支障がない
+// 型 'ZodObject<{ title: ZodString; completed: ZodDefault<ZodBoolean>; }, "strip", ZodTypeAny, { title: string; completed: boolean; }, { title: string; completed?: boolean | undefined; }>' の引数を型 'ZodType<any, ZodTypeDef, any>' のパラメーターに割り当てることはできません。
+// 型 'ZodObject<{ title: ZodString; completed: ZodDefault<ZodBoolean>; }, "strip", ZodTypeAny, { title: string; completed: boolean; }, { title: string; completed?: boolean | undefined; }>' には 型 'ZodType<any, ZodTypeDef, any>' からの次のプロパティがありません: "~standard", "~validate"
+
+
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { CreateTodoSchema, UpdateTodoSchema } from "@shared/validation/todo";

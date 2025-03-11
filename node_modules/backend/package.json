@@ -20,7 +20,7 @@
     "drizzle-orm": "latest",
     "hono": "latest",
     "uuid": "latest",
-    "zod": "3.22.4"
+    "zod": "latest"
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
