@@ -1,38 +1,117 @@
-# sv
+# フロントエンド (SvelteKit)
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+このディレクトリにはSvelteKit + TailwindCSSを使用したフロントエンド実装が含まれています。
 
-## Creating a project
+## 技術スタック
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **フレームワーク**: SvelteKit v2.19.0
+- **UIライブラリ**: TailwindCSS v4.0
+- **状態管理**: Svelte Runes ($state, $derived)
+- **API通信**: Fetch API
 
-```bash
-# create a new project in the current directory
-npx sv create
+## ディレクトリ構造
 
-# create a new project in my-app
-npx sv create my-app
+```
+frontend/
+├── src/
+│   ├── lib/            # 共通コンポーネントとロジック
+│   │   ├── components/ # UIコンポーネント
+│   │   │   ├── ui/     # 基本UIコンポーネント (Button, Card, Input 等)
+│   │   │   ├── layout/ # レイアウト関連コンポーネント (Header, ThemeToggle 等)
+│   │   │   └── todo/   # Todo関連のコンポーネント
+│   ├── routes/         # ページルート
+│   └── app.css         # グローバルスタイルとテーマ変数
+└── static/             # 静的ファイル
 ```
 
-## Developing
+## テーマシステム
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+アプリケーションはCSSカスタムプロパティ（変数）を使用したテーマシステムを実装しています。
 
-```bash
-npm run dev
+### テーマ変数
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+`app.css`でテーマ変数が定義されています：
+
+```css
+:root {
+  /* ライトモード用の変数 */
+  --color-bg-primary: #f9fafb;
+  --color-bg-secondary: #ffffff;
+  --color-bg-accent: #0d99ff;
+  /* 他の変数... */
+}
+
+.dark {
+  /* ダークモード用の変数 */
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252525;
+  /* 他の変数... */
+}
 ```
 
-## Building
+### テーマ変数の使用方法
 
-To create a production version of your app:
+#### Tailwindユーティリティクラスでの使用
 
-```bash
-npm run build
+基本ユーティリティクラス:
+```html
+<div class="bg-theme-primary text-theme-secondary border-theme"></div>
 ```
 
-You can preview the production build with `npm run preview`.
+#### ホバー効果での使用
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+ホバー効果を実装するには、以下のように直接CSS変数を参照します：
+
+```html
+<button class="hover:bg-[var(--color-bg-button-hover)]">ボタン</button>
+```
+
+> **注意**: `hover:bg-theme-button-hover`のような間接参照は正しく機能しないため、必ず`hover:bg-[var(--color-bg-button-hover)]`のような直接参照を使用してください。
+
+## テーマの切り替え
+
+アプリケーションはライトモード、ダークモード、システム設定に基づく自動切り替えをサポートしています。
+
+```javascript
+// ダークモードの切り替え
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  document.documentElement.classList.toggle('dark', darkMode);
+  localStorage.setItem('darkMode', darkMode.toString());
+}
+```
+
+## コンポーネント一覧
+
+主要なUIコンポーネント：
+
+- **Button**: 一般的なボタン
+- **Card**: コンテンツを包むカードコンポーネント
+- **Input**: フォーム入力要素
+- **Checkbox**: カスタムスタイルのチェックボックス
+- **ThemeToggle**: テーマ切り替えボタン
+- **TodoItem**: Todoアイテムの表示と操作
+
+## 開発
+
+```bash
+# 開発サーバーの起動
+bun run dev
+
+# プロダクションビルド
+bun run build
+```
+
+## トラブルシューティング
+
+### ホバー効果が機能しない場合
+
+Tailwindでテーマ変数を使用したホバー効果が機能しない場合は、以下の形式を使用してください：
+
+```html
+<!-- 推奨 -->
+<button class="hover:bg-[var(--color-bg-button-hover)]">ボタン</button>
+
+<!-- 機能しない -->
+<button class="hover:bg-theme-button-hover">ボタン</button>
+```

@@ -21,8 +21,8 @@
         onclick={setLightMode}
         class={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
           !darkMode 
-            ? 'bg-blue-500 text-white hover:bg-blue-600' 
-            : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white'
+            ? 'bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]' 
+            : 'bg-gray-200 hover:bg-[var(--color-bg-button-hover)] text-theme-secondary hover:text-theme-primary'
         }`}
       >
         ライト
@@ -32,8 +32,8 @@
         onclick={setDarkMode}
         class={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
           darkMode 
-            ? 'bg-blue-500 text-white hover:bg-blue-600' 
-            : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white'
+            ? 'bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]' 
+            : 'bg-gray-200 hover:bg-[var(--color-bg-button-hover)] text-theme-secondary hover:text-theme-primary'
         }`}
       >
         ダーク
@@ -41,7 +41,7 @@
       <button
         type="button"
         onclick={resetToSystemTheme}
-        class="px-3 py-1 rounded text-sm transition-colors duration-200 bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+        class="px-3 py-1 rounded text-sm transition-colors duration-200 bg-gray-200 hover:bg-[var(--color-bg-button-hover)] text-theme-secondary hover:text-theme-primary"
       >
         システム設定
       </button>

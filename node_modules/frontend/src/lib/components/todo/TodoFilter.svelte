@@ -28,8 +28,8 @@
     <button
       class={`flex items-center gap-1 rounded-md px-3 py-1 text-sm transition-colors ${
         filter === "all"
-          ? "bg-[#0d99ff] text-white hover:bg-[#0a85e0] dark:hover:bg-[#1ea5ff]"
-          : "text-theme-secondary hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a]"
+          ? "bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]"
+          : "text-theme-secondary hover:bg-[var(--color-bg-button-hover)]"
       }`}
       on:click={setAll}
     >
@@ -38,8 +38,8 @@
     <button
       class={`flex items-center gap-1 rounded-md px-3 py-1 text-sm transition-colors ${
         filter === "active"
-          ? "bg-[#0d99ff] text-white hover:bg-[#0a85e0] dark:hover:bg-[#1ea5ff]"
-          : "text-theme-secondary hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a]"
+          ? "bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]"
+          : "text-theme-secondary hover:bg-[var(--color-bg-button-hover)]"
       }`}
       on:click={setActive}
     >
@@ -48,8 +48,8 @@
     <button
       class={`flex items-center gap-1 rounded-md px-3 py-1 text-sm transition-colors ${
         filter === "completed"
-          ? "bg-[#0d99ff] text-white hover:bg-[#0a85e0] dark:hover:bg-[#1ea5ff]"
-          : "text-theme-secondary hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a]"
+          ? "bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]"
+          : "text-theme-secondary hover:bg-[var(--color-bg-button-hover)]"
       }`}
       on:click={setCompleted}
     >

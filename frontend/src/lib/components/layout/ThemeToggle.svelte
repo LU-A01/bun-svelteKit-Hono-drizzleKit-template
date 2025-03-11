@@ -11,7 +11,7 @@
 <button 
   type="button"
   onclick={toggleDarkMode}
-  class="flex h-10 w-10 items-center justify-center rounded-full text-theme-muted transition-colors hover:bg-[#e0e0e0] hover:text-theme-primary dark:hover:bg-[#3a3a3a] dark:hover:text-white"
+  class="flex h-10 w-10 items-center justify-center rounded-full text-theme-muted transition-colors hover:bg-[var(--color-bg-button-hover)] hover:text-theme-primary"
   aria-label={darkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
 >
   {#if darkMode}
