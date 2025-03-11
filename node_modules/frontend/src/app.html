@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- ダークモード設定のためのインラインスクリプト（ページ読み込み時のちらつきを防止） -->
+		<script>
+			// ローカルストレージから設定を取得
+			const savedTheme = localStorage.getItem('darkMode');
+			// ローカルストレージに設定があればそれを使用、なければシステム設定を使用
+			if (savedTheme === 'true' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark');
+			}
+		</script>
+		<!-- Google Fontsの事前読み込み -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover" style="font-family: 'Inter', sans-serif;">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

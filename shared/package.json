@@ -1,0 +1,29 @@
+{
+  "name": "shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    "./*": "./*/index.ts",
+    "./constants": "./constants/index.ts",
+    "./dto": "./dto/index.ts",
+    "./models": "./models/index.ts",
+    "./utils": "./utils/index.ts",
+    "./validation": "./validation/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'No build step needed for shared'",
+    "dev": "echo 'No dev server for shared'",
+    "test": "echo 'No tests for shared yet'",
+    "lint": "bunx @biomejs/biome check .",
+    "format": "bunx @biomejs/biome format --write ."
+  },
+  "dependencies": {
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "typescript": "5.3.3"
+  }
+}

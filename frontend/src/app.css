@@ -1,0 +1,103 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* ベースカラーのCSS変数 */
+:root {
+  /* ライトモード用の変数 */
+  --color-bg-primary: #f9fafb; /* bg-gray-50相当 */
+  --color-bg-secondary: #ffffff; /* bg-white相当 */
+  --color-bg-accent: #0d99ff;
+  --color-bg-card: #ffffff;
+  --color-bg-header: #ffffff;
+  --color-bg-hover: #f3f4f6; /* hover用のライトグレー */
+
+  --color-text-primary: #111827; /* text-gray-900相当 */
+  --color-text-secondary: #4b5563; /* text-gray-600相当 */
+  --color-text-accent: #0d99ff;
+  --color-text-muted: #6b7280; /* text-gray-500相当 */
+
+  --color-border-primary: #e5e7eb; /* border-gray-200相当 */
+  --color-border-secondary: #d1d5db; /* border-gray-300相当 */
+  --color-border-hover: #9ca3af; /* hover時のボーダー色 */
+
+  --color-shadow: rgba(0, 0, 0, 0.1);
+
+  /* アニメーション速度 */
+  --transition-speed: 0.2s;
+}
+
+/* ダークモード用の変数 */
+.dark {
+  --color-bg-primary: #1e1e1e; /* 元のdark:bg-[#1e1e1e] */
+  --color-bg-secondary: #252525; /* 元のdark:bg-[#252525] */
+  --color-bg-accent: #0d99ff;
+  --color-bg-card: #252525; /* 元のdark:bg-[#252525] */
+  --color-bg-header: #252525; /* 元のdark:bg-[#252525] */
+  --color-bg-hover: #323232; /* ダークモードのhover色 */
+
+  --color-text-primary: #f9fafb; /* dark:text-gray-100相当 */
+  --color-text-secondary: #9ca3af; /* dark:text-gray-400相当 */
+  --color-text-accent: #0d99ff;
+  --color-text-muted: #9ca3af; /* dark:text-gray-400相当 */
+
+  --color-border-primary: #374151; /* dark:border-gray-800相当 */
+  --color-border-secondary: #4b5563; /* dark:border-gray-700相当 */
+  --color-border-hover: #6b7280; /* ダークモードのhover時ボーダー色 */
+
+  --color-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* 基本スタイル */
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-speed),
+    color var(--transition-speed);
+}
+
+/* カスタムクラス - ライトモード/ダークモード共通で使えるユーティリティクラス */
+.bg-theme-primary {
+  background-color: var(--color-bg-primary);
+}
+
+.bg-theme-secondary {
+  background-color: var(--color-bg-secondary);
+}
+
+.bg-theme-card {
+  background-color: var(--color-bg-card);
+}
+
+.bg-theme-header {
+  background-color: var(--color-bg-header);
+}
+
+.text-theme-primary {
+  color: var(--color-text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-theme-muted {
+  color: var(--color-text-muted);
+}
+
+.border-theme {
+  border-color: var(--color-border-primary);
+}
+
+.shadow-theme {
+  box-shadow: 0 1px 3px 0 var(--color-shadow),
+    0 1px 2px -1px var(--color-shadow);
+}
+
+.bg-theme-hover {
+  background-color: var(--color-bg-hover);
+}
+
+.border-theme-hover {
+  border-color: var(--color-border-hover);
+}

@@ -1,0 +1,39 @@
+{
+  "name": "bun-sveltekit-hono-drizzlekit-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.2.4",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "database",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "cd backend && bun run start",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "db:migrate": "cd database && bun run migrate",
+    "db:studio": "cd database && bun run studio",
+    "biome:check": "bunx @biomejs/biome check --apply .",
+    "biome:format": "bunx @biomejs/biome format --write .",
+    "clean": "rm -rf node_modules/.cache bun.lockb **/bun.lock* && bun install",
+    "clean:windows": "if (Test-Path node_modules/.cache) { Remove-Item -Recurse -Force node_modules/.cache }; Get-ChildItem -Recurse -Filter bun.lock* | Remove-Item -Force; bun install --force"
+  },
+  "dependencies": {
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "turbo": "2.0.1",
+    "typescript": "5.3.3"
+  },
+  "engines": {
+    "bun": ">=1.0.0",
+    "node": ">=18.0.0"
+  }
+}

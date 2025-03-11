@@ -1,0 +1,24 @@
+{
+  "name": "database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "bun migrate.ts",
+    "studio": "drizzle-kit studio",
+    "lint": "bunx @biomejs/biome check .",
+    "format": "bunx @biomejs/biome format --write ."
+  },
+  "dependencies": {
+    "@libsql/client": "latest",
+    "dotenv": "latest",
+    "drizzle-orm": "latest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "@types/node": "latest",
+    "drizzle-kit": "latest",
+    "typescript": "5.3.3"
+  }
+}
