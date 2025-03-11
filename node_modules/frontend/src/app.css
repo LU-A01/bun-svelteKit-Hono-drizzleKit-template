@@ -2,6 +2,17 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* フォント設定 */
+@layer base {
+  .font-inter {
+    font-family: "Inter", sans-serif;
+  }
+
+  .contents {
+    display: contents;
+  }
+}
+
 /* ベースカラーのCSS変数 */
 :root {
   /* ライトモード用の変数 */

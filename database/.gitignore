@@ -1,0 +1,31 @@
+# ビルド成果物
+dist/
+lib/
+
+# 環境変数（ルートの.envを参照）
+.env
+.env.*
+!.env.example
+
+# データベースファイル
+*.db
+*.sqlite
+*.sqlite3
+dev.db
+test.db
+*.db-journal
+*.sqlite-journal
+
+# DrizzleKit生成ファイル
+drizzle/meta/_journal.json
+
+# マイグレーションバックアップ
+migrations/backup/
+
+# 一時ファイル
+.tmp/
+temp/
+
+# デバッグファイル
+*.map
+*.tsbuildinfo 

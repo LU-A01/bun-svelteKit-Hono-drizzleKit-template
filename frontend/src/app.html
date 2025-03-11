@@ -4,15 +4,30 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Todo Application</title>
 		<!-- ダークモード設定のためのインラインスクリプト（ページ読み込み時のちらつきを防止） -->
-		<script>
-			// ローカルストレージから設定を取得
-			const savedTheme = localStorage.getItem('darkMode');
-			// ローカルストレージに設定があればそれを使用、なければシステム設定を使用
-			if (savedTheme === 'true' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-				document.documentElement.classList.add('dark');
-			} else {
-				document.documentElement.classList.remove('dark');
+		<script data-sveltekit-noscroll preload>
+			// クライアントサイドでのみ実行
+			try {
+				if (typeof window !== 'undefined' && window.localStorage) {
+					// ローカルストレージから設定を取得
+					const savedTheme = localStorage.getItem('darkMode');
+					
+					// システムの設定を確認（matchMediaが利用可能な場合のみ）
+					const prefersDark = typeof window.matchMedia === 'function' 
+						? window.matchMedia('(prefers-color-scheme: dark)').matches 
+						: false;
+					
+					// ローカルストレージに設定があればそれを使用、なければシステム設定を使用
+					if (savedTheme === 'true' || (savedTheme === null && prefersDark)) {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+				}
+			} catch (e) {
+				// エラー処理 - プライベートブラウジングモードなどでローカルストレージにアクセスできない場合
+				console.warn('Dark mode initialization failed:', e);
 			}
 		</script>
 		<!-- Google Fontsの事前読み込み -->
@@ -21,7 +36,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover" style="font-family: 'Inter', sans-serif;">
-		<div style="display: contents">%sveltekit.body%</div>
+	<body data-sveltekit-preload-data="hover" class="font-inter">
+		<div class="contents">%sveltekit.body%</div>
 	</body>
 </html>
