@@ -2,6 +2,9 @@
 dist/
 lib/
 
+# 依存関係
+node_modules/
+
 # 環境変数（ルートの.envを参照）
 .env
 .env.*
