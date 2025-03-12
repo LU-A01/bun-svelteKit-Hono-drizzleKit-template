@@ -85,8 +85,11 @@ A monorepo template for web application development using Bun. This template ado
 アプリケーションはDockerを使用して簡単に実行できます：
 
 ```bash
-# Docker Composeを使用して全サービスを起動
+# Docker Composeを使用して全サービスを起動（Linux/macOS）
 docker compose up
+
+# Windowsでの実行（デバッグスクリプト付き）
+bun run docker:dev:windows
 
 # バックグラウンドで起動
 docker compose up -d
@@ -106,6 +109,19 @@ docker compose down
 - **バックエンド**: Hono.jsアプリケーションを実行するコンテナ (ポート3000)
 - **フロントエンド**: SvelteKitアプリケーションを実行するコンテナ (ポート5173)
 - **データベース**: ローカル開発用のSQLiteデータベースコンテナ
+
+### Windows環境での注意点
+
+Windows環境でDockerを使用する場合は、以下の点に注意してください：
+
+1. Docker Desktopが正しくインストールされ、WSL2が有効になっていることを確認
+2. トラブルシューティング用のデバッグスクリプトを使用：`bun run docker:debug`
+3. 詳細な手順は`CLAUDE.md`の「Windows環境でのDocker使用方法」セクションを参照
+
+よくある問題：
+- Docker Desktopが起動していない場合のエラー
+- WSL2の接続問題
+- ボリュームマウントの問題
 
 ### 本番環境でのTursoデータベース
 

@@ -1,0 +1,103 @@
+name: Dockerイメージビルド
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # 基本設定
+  NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+  PORT: 3000
+  PORT_FRONTEND: 5173
+  LOG_LEVEL: info
+
+  # データベース設定
+  DATABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL || 'file:/app/database/data/dev.db' }}
+  DATABASE_AUTH_TOKEN: ${{ secrets.DATABASE_AUTH_TOKEN || '' }}
+
+  # API設定
+  API_SECRET: ${{ secrets.API_SECRET || 'development_secret' }}
+
+  # CORS設定
+  CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS || 'http://localhost:5173,http://frontend:5173,http://127.0.0.1:5173' }}
+
+  # Docker設定
+  DEV_MOUNT: "" # CI環境ではボリュームマウントを無効化
+
+jobs:
+  build:
+    name: Dockerイメージのビルドとプッシュ
+    runs-on: ubuntu-latest
+    steps:
+      - name: コードのチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Dockerコンポーズのセットアップ
+        uses: docker/setup-buildx-action@v3
+
+      - name: Dockerビルドキャッシュの設定
+        uses: actions/cache@v4
+        with:
+          path: ~/.docker
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker-compose.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: DockerHubにログイン
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: イメージタグの設定
+        id: tags
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "BACKEND_TAG=myapp/backend:latest" >> $GITHUB_ENV
+            echo "FRONTEND_TAG=myapp/frontend:latest" >> $GITHUB_ENV
+          else
+            echo "BACKEND_TAG=myapp/backend:dev" >> $GITHUB_ENV
+            echo "FRONTEND_TAG=myapp/frontend:dev" >> $GITHUB_ENV
+          fi
+
+      - name: バックエンドイメージのビルド
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/backend.Dockerfile
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ env.BACKEND_TAG }}
+          build-args: |
+            NODE_ENV=${{ env.NODE_ENV }}
+            PORT=${{ env.PORT }}
+            API_SECRET=${{ env.API_SECRET }}
+            CORS_ALLOWED_ORIGINS=${{ env.CORS_ALLOWED_ORIGINS }}
+          cache-from: type=local,src=~/.docker
+          cache-to: type=local,dest=~/.docker,mode=max
+
+      - name: フロントエンドイメージのビルド
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/frontend.Dockerfile
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ env.FRONTEND_TAG }}
+          build-args: |
+            NODE_ENV=${{ env.NODE_ENV }}
+            PORT_FRONTEND=${{ env.PORT_FRONTEND }}
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL || 'http://backend:3000/api' }}
+            VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL || 'http://backend:3000' }}
+            VITE_APP_TITLE=${{ secrets.VITE_APP_TITLE || 'Production App' }}
+          cache-from: type=local,src=~/.docker
+          cache-to: type=local,dest=~/.docker,mode=max
+
+      - name: イメージ情報の出力
+        run: |
+          echo "バックエンドイメージ: ${{ env.BACKEND_TAG }}"
+          echo "フロントエンドイメージ: ${{ env.FRONTEND_TAG }}"
+          echo "ビルド環境: ${{ env.NODE_ENV }}"
+          echo "CORS設定: ${{ env.CORS_ALLOWED_ORIGINS }}" 

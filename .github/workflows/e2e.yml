@@ -7,6 +7,28 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # 基本設定
+  NODE_ENV: development
+  PORT: 3000
+  PORT_FRONTEND: 5173
+  LOG_LEVEL: info
+  
+  # データベース設定
+  DATABASE_URL: file:/app/database/data/dev.db
+  DATABASE_AUTH_TOKEN: ${{ secrets.DATABASE_AUTH_TOKEN || '' }}
+  
+  # E2Eテスト用の環境変数
+  PLAYWRIGHT_BROWSERS: chromium
+  SKIP_BROWSER_DOWNLOAD: 0
+  
+  # CI環境用のコマンド
+  SETUP_CMD: bun install
+  E2E_CMD: cd frontend && bunx playwright test
+  
+  # 環境変数を.envファイルで設定できるようにする
+  DEV_MOUNT: "" # CI環境ではボリュームマウントを無効化
+
 jobs:
   e2e-test:
     name: E2Eテスト
@@ -15,43 +37,130 @@ jobs:
       - name: コードのチェックアウト
         uses: actions/checkout@v4
 
-      - name: Bunのセットアップ
-        uses: oven-sh/setup-bun@v1
+      - name: Dockerコンポーズのセットアップ
+        uses: docker/setup-buildx-action@v3
+
+      - name: Dockerビルドキャッシュの設定
+        uses: actions/cache@v4
         with:
-          bun-version: 1.2.4
+          path: ~/.docker
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker-compose.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
 
       - name: 依存関係のインストール
-        run: bun install
+        run: docker compose run --rm setup
+        env:
+          SETUP_CMD: bun install
 
       - name: Playwrightのインストール
-        run: bunx playwright install --with-deps chromium
+        run: docker compose run --rm setup bash -c "cd frontend && bunx playwright install --with-deps chromium"
+        env:
+          PLAYWRIGHT_BROWSERS: chromium
+          SKIP_BROWSER_DOWNLOAD: 0
 
-      - name: テスト用データベースの準備
-        run: |
-          echo "DATABASE_URL=file:./dev-test.db" > .env
-          echo "BACKEND_URL=http://localhost:3000" >> .env
-          echo "API_BASE_URL=http://localhost:3000/api" >> .env
-          echo "PORT=3000" >> .env
-          echo "PORT_FRONTEND=5173" >> .env
-          echo "FRONTEND_URL=http://localhost:5173" >> .env
-          cd database && bun run migrate
+      - name: データベースサービス起動
+        run: docker compose up -d database
 
-      - name: バックエンドとフロントエンドをバックグラウンドで起動
+      - name: データベースが起動するまで待機
         run: |
-          cd backend && bun run dev &
-          cd frontend && bun run dev &
-          # サービスが起動するのを待つ
-          sleep 15
+          echo "データベースの準備を待機しています..."
+          timeout=60
+          while [ $timeout -gt 0 ]; do
+            if docker compose ps database | grep -q "healthy"; then
+              echo "データベースが準備完了しました"
+              break
+            fi
+            echo "データベース待機中... 残り $timeout 秒"
+            sleep 5
+            timeout=$((timeout - 5))
+          done
+
+          if [ $timeout -le 0 ]; then
+            echo "データベース起動のタイムアウト"
+            docker compose logs database
+            exit 1
+          fi
+
+      - name: バックエンドとフロントエンドのサービス起動
+        run: |
+          docker compose up -d backend
+          docker compose up -d frontend
+        env:
+          PORT: ${{ env.PORT }}
+          PORT_FRONTEND: ${{ env.PORT_FRONTEND }}
+          VITE_API_BASE_URL: http://backend:${{ env.PORT }}/api
+          VITE_BACKEND_URL: http://backend:${{ env.PORT }}
+          BACKEND_CMD: bun run dev
+          FRONTEND_CMD: bun run dev
+
+      - name: サービスが起動するまで待機
+        run: |
+          echo "バックエンドの準備を待機しています..."
+          timeout=60
+          while [ $timeout -gt 0 ]; do
+            if docker compose ps backend | grep -q "healthy"; then
+              echo "バックエンドが準備完了しました"
+              break
+            fi
+            echo "バックエンド待機中... 残り $timeout 秒"
+            sleep 5
+            timeout=$((timeout - 5))
+          done
+
+          if [ $timeout -le 0 ]; then
+            echo "バックエンド起動のタイムアウト"
+            docker compose logs backend
+            exit 1
+          fi
+
+          echo "フロントエンドの準備を待機しています..."
+          timeout=60
+          while [ $timeout -gt 0 ]; do
+            if docker compose ps frontend | grep -q "healthy"; then
+              echo "フロントエンドが準備完了しました"
+              break
+            fi
+            echo "フロントエンド待機中... 残り $timeout 秒"
+            sleep 5
+            timeout=$((timeout - 5))
+          done
+
+          if [ $timeout -le 0 ]; then
+            echo "フロントエンド起動のタイムアウト"
+            docker compose logs frontend
+            exit 1
+          fi
 
       - name: E2Eテスト実行
-        run: bun run test:e2e
+        run: docker compose run --rm e2e
+        env:
+          NODE_ENV: test
+          PLAYWRIGHT_BROWSERS: chromium
+          SKIP_BROWSER_DOWNLOAD: 1 # ブラウザは既にインストール済み
+          # テスト用の環境変数をカスタマイズ
+          TEST_TIMEOUT: ${{ secrets.TEST_TIMEOUT || '30000' }}
+          VITE_APP_TITLE: "E2E Test App"
 
-      - name: テストが失敗した場合のスクリーンショットアップロード
+      - name: コンテナログの収集
+        if: always()
+        run: |
+          mkdir -p logs
+          docker compose logs database > logs/database.log
+          docker compose logs backend > logs/backend.log
+          docker compose logs frontend > logs/frontend.log
+
+      - name: テスト結果とログのアップロード
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: playwright-results
+          name: e2e-test-results
           path: |
-            playwright-report/
-            test-results/
+            frontend/test-results/
+            frontend/playwright-report/
+            logs/
           retention-days: 7
+
+      - name: サービスの停止とクリーンアップ
+        if: always()
+        run: docker compose down -v
