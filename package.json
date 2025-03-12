@@ -10,15 +10,15 @@
     "build": "turbo run build",
     "start": "cd backend && bun run start",
     "test": "turbo run test",
-    "test:e2e": "playwright test",
-    "test:unit": "turbo run test:unit",
+    "test:e2e": "concurrently -k -s first \"cd backend && bun run dev\" \"wait-on http://localhost:3000/health && cd frontend && bun run test:e2e\"",
     "test:coverage": "turbo run test:coverage",
     "test:watch": "turbo run test:watch",
     "test:backend": "cd backend && bun run test",
-    "test:frontend": "cd frontend && bun run test:unit",
+    "test:frontend": "cd frontend && bun run test:unit -- --run",
     "test:all": "bun run test:backend && bun run test:frontend",
-    "lint": "turbo run lint",
-    "format": "turbo run format",
+    "lint": "bun run biome:check",
+    "lint:fix": "bun run biome:check:apply",
+    "format": "bun run biome:format",
     "db:migrate": "cd database && bun run migrate",
     "db:studio": "cd database && bun run studio",
     "biome:check": "bunx @biomejs/biome check .",
@@ -29,6 +29,8 @@
     "clean:windows": "if (Test-Path node_modules/.cache) { Remove-Item -Recurse -Force node_modules/.cache }; Get-ChildItem -Recurse -Filter bun.lock* | Remove-Item -Force; bun install --force"
   },
   "dependencies": {
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.3",
     "zod": "3.22.4"
   },
   "devDependencies": {

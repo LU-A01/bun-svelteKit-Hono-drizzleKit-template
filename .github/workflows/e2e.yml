@@ -24,7 +24,7 @@ jobs:
         run: bun install
 
       - name: Playwrightのインストール
-        run: bunx playwright install --with-deps chromium
+        run: cd frontend && bunx playwright install --with-deps chromium
 
       - name: テスト用データベースの準備
         run: |
@@ -36,22 +36,75 @@ jobs:
           echo "FRONTEND_URL=http://localhost:5173" >> .env
           cd database && bun run migrate
 
-      - name: バックエンドとフロントエンドをバックグラウンドで起動
+      - name: バックエンドの起動
         run: |
           cd backend && bun run dev &
+          echo "バックエンドのプロセスID: $!" > backend_pid.txt
+
+          # バックエンドが起動するまで待機
+          echo "バックエンドの起動を待機しています..."
+          max_retries=30
+          count=0
+          while ! curl -s http://localhost:3000/health &> /dev/null && [ $count -lt $max_retries ]; do
+            sleep 2
+            count=$((count + 1))
+            echo "バックエンド待機中... $count/$max_retries"
+          done
+
+          if [ $count -eq $max_retries ]; then
+            echo "バックエンドの起動タイムアウト"
+            exit 1
+          fi
+
+          echo "バックエンドが起動しました！"
+          curl -s http://localhost:3000/health | jq .
+
+      - name: フロントエンドの起動
+        run: |
           cd frontend && bun run dev &
-          # サービスが起動するのを待つ
-          sleep 15
+          echo "フロントエンドのプロセスID: $!" > frontend_pid.txt
+
+          # フロントエンドが起動するまで待機
+          echo "フロントエンドの起動を待機しています..."
+          max_retries=30
+          count=0
+          while ! curl -s http://localhost:5173 &> /dev/null && [ $count -lt $max_retries ]; do
+            sleep 2
+            count=$((count + 1))
+            echo "フロントエンド待機中... $count/$max_retries"
+          done
+
+          if [ $count -eq $max_retries ]; then
+            echo "フロントエンドの起動タイムアウト"
+            exit 1
+          fi
+
+          echo "フロントエンドが起動しました！"
 
       - name: E2Eテスト実行
-        run: bun run test:e2e
+        run: cd frontend && bun run test:e2e
 
-      - name: テストが失敗した場合のスクリーンショットアップロード
+      - name: プロセスの停止
+        if: always()
+        run: |
+          if [ -f backend_pid.txt ]; then
+            BACKEND_PID=$(cat backend_pid.txt | awk '{print $2}')
+            echo "バックエンドプロセス $BACKEND_PID を停止しています..."
+            kill -9 $BACKEND_PID || true
+          fi
+
+          if [ -f frontend_pid.txt ]; then
+            FRONTEND_PID=$(cat frontend_pid.txt | awk '{print $2}')
+            echo "フロントエンドプロセス $FRONTEND_PID を停止しています..."
+            kill -9 $FRONTEND_PID || true
+          fi
+
+      - name: テストが失敗した場合のスクリーンショットとログのアップロード
         uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-results
           path: |
-            playwright-report/
-            test-results/
+            frontend/playwright-report/
+            frontend/test-results/
           retention-days: 7
