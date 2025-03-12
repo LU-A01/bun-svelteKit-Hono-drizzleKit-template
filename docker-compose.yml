@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  database:
+    build:
+      context: .
+      dockerfile: docker/database.Dockerfile
+    volumes:
+      - db-data:/app/database/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/database/data/dev.db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - PORT=${PORT:-3000}
+      - FRONTEND_URL=http://frontend:${PORT_FRONTEND:-5173}
+      - DATABASE_URL=file:/app/database/data/dev.db
+    volumes:
+      - db-data:/app/database/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-3000}/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "${PORT_FRONTEND:-5173}:${PORT_FRONTEND:-5173}"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - PORT_FRONTEND=${PORT_FRONTEND:-5173}
+      - VITE_BACKEND_URL=http://backend:${PORT:-3000}
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT_FRONTEND:-5173}/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

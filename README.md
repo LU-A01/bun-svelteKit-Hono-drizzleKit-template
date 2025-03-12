@@ -66,6 +66,51 @@ A monorepo template for web application development using Bun. This template ado
 
 > format:code changes → lint → Unit Test → Integrated Test → E2E Test → Build → Deploy
 
+### GitHub Actions Workflows
+
+プロジェクトは以下のGitHub Actionsワークフローを使用しています：
+
+1. **継続的インテグレーション/デプロイ**
+   - コード品質チェック（リントとフォーマット）
+   - ユニットテスト実行（バックエンドとフロントエンド）
+   - Dockerイメージビルド
+   - デプロイ（設定時）
+
+2. **エンドツーエンドテスト**
+   - Playwrightを使用したブラウザベースのE2Eテスト
+   - テスト結果のアーティファクト保存
+
+## 🐳 Docker環境
+
+アプリケーションはDockerを使用して簡単に実行できます：
+
+```bash
+# Docker Composeを使用して全サービスを起動
+docker compose up
+
+# バックグラウンドで起動
+docker compose up -d
+
+# 特定のサービスのみ起動
+docker compose up frontend backend
+
+# ログを表示
+docker compose logs -f
+
+# 環境を停止
+docker compose down
+```
+
+### Docker構成
+
+- **バックエンド**: Hono.jsアプリケーションを実行するコンテナ (ポート3000)
+- **フロントエンド**: SvelteKitアプリケーションを実行するコンテナ (ポート5173)
+- **データベース**: ローカル開発用のSQLiteデータベースコンテナ
+
+### 本番環境でのTursoデータベース
+
+開発環境ではローカルSQLiteデータベースを使用しますが、本番環境ではTursoクラウドデータベースを使用することをお勧めします。`.env`ファイルで適切なTurso接続情報を設定してください。
+
 ## 🧪 Testing
 
 The project includes a comprehensive test suite for both frontend and backend:

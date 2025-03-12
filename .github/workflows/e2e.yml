@@ -1,0 +1,57 @@
+name: エンドツーエンドテスト
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e-test:
+    name: E2Eテスト
+    runs-on: ubuntu-latest
+    steps:
+      - name: コードのチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Bunのセットアップ
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.4
+
+      - name: 依存関係のインストール
+        run: bun install
+
+      - name: Playwrightのインストール
+        run: bunx playwright install --with-deps chromium
+
+      - name: テスト用データベースの準備
+        run: |
+          echo "DATABASE_URL=file:./dev-test.db" > .env
+          echo "BACKEND_URL=http://localhost:3000" >> .env
+          echo "API_BASE_URL=http://localhost:3000/api" >> .env
+          echo "PORT=3000" >> .env
+          echo "PORT_FRONTEND=5173" >> .env
+          echo "FRONTEND_URL=http://localhost:5173" >> .env
+          cd database && bun run migrate
+
+      - name: バックエンドとフロントエンドをバックグラウンドで起動
+        run: |
+          cd backend && bun run dev &
+          cd frontend && bun run dev &
+          # サービスが起動するのを待つ
+          sleep 15
+
+      - name: E2Eテスト実行
+        run: bun run test:e2e
+
+      - name: テストが失敗した場合のスクリーンショットアップロード
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
