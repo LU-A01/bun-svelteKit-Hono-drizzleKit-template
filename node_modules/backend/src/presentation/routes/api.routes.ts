@@ -14,9 +14,9 @@ apiRoutes.get('/health', (c) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
-    version: process.env.npm_package_version || '0.1.0'
+    version: process.env.npm_package_version || '0.1.0',
   };
-  
+
   return c.json(healthInfo);
 });
 

@@ -1,9 +1,9 @@
+import { existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createClient } from '@libsql/client';
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
-import { existsSync, mkdirSync } from 'node:fs';
 
 // プロジェクトルートの.envファイルを読み込む
 dotenv.config({ path: resolve(__dirname, '../.env') });
@@ -37,7 +37,7 @@ interface LibSQLConnectionConfig {
 // SQLiteファイルパスの修正
 if (isSQLite && url) {
   let dbPath = '';
-  
+
   if (url.startsWith('sqlite:')) {
     // SQLiteファイルのパスを作成
     const dbName = url.replace('sqlite:', '');
@@ -45,7 +45,7 @@ if (isSQLite && url) {
   } else if (url.startsWith('file:')) {
     // file:から始まるURLの場合
     const dbName = url.replace('file:', '').replace('./', '');
-    
+
     // ./で始まる相対パスの処理
     if (url.includes('./')) {
       dbPath = resolve(__dirname, dbName);
@@ -64,7 +64,7 @@ if (isSQLite && url) {
   url = `file:${dbPath}`;
   console.log(`- 解決されたパス: ${dbPath}`);
   console.log(`- 最終的なURL: ${url}`);
-  
+
   // パス情報を出力（デバッグ用）
   console.log('データディレクトリパス:', dataDir);
 }
