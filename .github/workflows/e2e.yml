@@ -21,25 +21,79 @@ jobs:
           bun-version: 1.2.4
 
       - name: 依存関係のインストール
-        run: bun install
+        run: |
+          # バンのキャッシュをクリア
+          rm -rf ~/.bun/install/cache
 
-      - name: Playwrightのインストール
-        run: cd frontend && bunx playwright install --with-deps chromium
+          # 依存関係をクリーンインストール
+          echo "依存関係をクリーンインストールしています..."
+          bun install --force
+
+          # 必要なモジュールが存在するか確認
+          if [ ! -d "backend/node_modules/@hono/zod-validator" ]; then
+            echo "@hono/zod-validator が見つかりません。明示的にインストールします。"
+            cd backend
+            bun add @hono/zod-validator
+            cd ..
+          else
+            echo "@hono/zod-validator は既にインストールされています"
+            ls -la backend/node_modules/@hono
+          fi
+
+          # モジュール解決をデバッグ
+          echo "Node.jsモジュール解決をテストしています..."
+          cd backend
+          echo "console.log('モジュールが正常に解決されました: ' + require.resolve('@hono/zod-validator'));" > test-resolve.js
+          bun run test-resolve.js || echo "モジュール解決に失敗しました"
+          cd ..
 
       - name: テスト用データベースの準備
         run: |
+          # 環境変数ファイルの作成
           echo "DATABASE_URL=file:./dev-test.db" > .env
           echo "BACKEND_URL=http://localhost:3000" >> .env
           echo "API_BASE_URL=http://localhost:3000/api" >> .env
           echo "PORT=3000" >> .env
           echo "PORT_FRONTEND=5173" >> .env
           echo "FRONTEND_URL=http://localhost:5173" >> .env
-          cd database && bun run migrate
+
+          # データベースディレクトリの確認
+          mkdir -p database/data
+
+          # 環境情報の表示
+          echo "環境情報:"
+          echo "- 作業ディレクトリ: $(pwd)"
+          echo "- ファイル一覧:"
+          ls -la
+          echo "- database ディレクトリ:"
+          ls -la database
+
+          # データベースマイグレーションの実行
+          cd database
+          echo "データベースマイグレーションを実行しています..."
+          bun run migrate
+
+          # データベースファイルが作成されたか確認
+          echo "データディレクトリの内容:"
+          mkdir -p data
+          ls -la data/
+
+          if [ -f ./data/dev-test.db ]; then
+            echo "データベースファイルが作成されました: $(ls -la ./data/dev-test.db)"
+          else
+            echo "データベースファイルが見つかりません。マイグレーションログを確認してください。"
+            echo "現在のディレクトリ構造:"
+            find . -type f -name "*.db" | sort
+          fi
+          cd ..
 
       - name: バックエンドの起動
         run: |
-          cd backend && bun run dev &
+          cd backend
+          # バックエンドのログをファイルに出力
+          bun run dev > backend.log 2>&1 &
           echo "バックエンドのプロセスID: $!" > backend_pid.txt
+          cd ..
 
           # バックエンドが起動するまで待機
           echo "バックエンドの起動を待機しています..."
@@ -49,20 +103,30 @@ jobs:
             sleep 2
             count=$((count + 1))
             echo "バックエンド待機中... $count/$max_retries"
+            
+            # 5回待機するごとにログを確認
+            if [ $((count % 5)) -eq 0 ]; then
+              echo "バックエンドログの最新部分:"
+              tail -n 20 backend/backend.log || true
+            fi
           done
 
           if [ $count -eq $max_retries ]; then
-            echo "バックエンドの起動タイムアウト"
+            echo "バックエンドの起動タイムアウト。ログを確認してください:"
+            cat backend/backend.log
             exit 1
           fi
 
           echo "バックエンドが起動しました！"
-          curl -s http://localhost:3000/health | jq .
+          curl -s http://localhost:3000/health || echo "健全性チェックに失敗しました"
 
       - name: フロントエンドの起動
         run: |
-          cd frontend && bun run dev &
+          cd frontend
+          # フロントエンドのログをファイルに出力
+          bun run dev > frontend.log 2>&1 &
           echo "フロントエンドのプロセスID: $!" > frontend_pid.txt
+          cd ..
 
           # フロントエンドが起動するまで待機
           echo "フロントエンドの起動を待機しています..."
@@ -72,39 +136,62 @@ jobs:
             sleep 2
             count=$((count + 1))
             echo "フロントエンド待機中... $count/$max_retries"
+            
+            # 5回待機するごとにログを確認
+            if [ $((count % 5)) -eq 0 ]; then
+              echo "フロントエンドログの最新部分:"
+              tail -n 20 frontend/frontend.log || true
+            fi
           done
 
           if [ $count -eq $max_retries ]; then
-            echo "フロントエンドの起動タイムアウト"
+            echo "フロントエンドの起動タイムアウト。ログを確認してください:"
+            cat frontend/frontend.log
             exit 1
           fi
 
           echo "フロントエンドが起動しました！"
 
+      - name: Playwrightのインストール
+        run: cd frontend && bunx playwright install --with-deps chromium
+
       - name: E2Eテスト実行
         run: cd frontend && bun run test:e2e
 
-      - name: プロセスの停止
+      - name: プロセスの停止とログの保存
         if: always()
         run: |
-          if [ -f backend_pid.txt ]; then
-            BACKEND_PID=$(cat backend_pid.txt | awk '{print $2}')
+          # バックエンドログを保存
+          mkdir -p logs
+          if [ -f backend/backend.log ]; then
+            cp backend/backend.log logs/
+          fi
+
+          # フロントエンドログを保存
+          if [ -f frontend/frontend.log ]; then
+            cp frontend/frontend.log logs/
+          fi
+
+          # プロセスの停止
+          if [ -f backend/backend_pid.txt ]; then
+            BACKEND_PID=$(cat backend/backend_pid.txt | awk '{print $2}')
             echo "バックエンドプロセス $BACKEND_PID を停止しています..."
             kill -9 $BACKEND_PID || true
           fi
 
-          if [ -f frontend_pid.txt ]; then
-            FRONTEND_PID=$(cat frontend_pid.txt | awk '{print $2}')
+          if [ -f frontend/frontend_pid.txt ]; then
+            FRONTEND_PID=$(cat frontend/frontend_pid.txt | awk '{print $2}')
             echo "フロントエンドプロセス $FRONTEND_PID を停止しています..."
             kill -9 $FRONTEND_PID || true
           fi
 
-      - name: テストが失敗した場合のスクリーンショットとログのアップロード
+      - name: ログとテスト結果のアップロード
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: playwright-results
+          name: test-logs-and-results
           path: |
+            logs/
             frontend/playwright-report/
             frontend/test-results/
           retention-days: 7

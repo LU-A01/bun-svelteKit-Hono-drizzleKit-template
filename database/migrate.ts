@@ -3,6 +3,7 @@ import { createClient } from '@libsql/client';
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
+import { existsSync, mkdirSync } from 'node:fs';
 
 // プロジェクトルートの.envファイルを読み込む
 dotenv.config({ path: resolve(__dirname, '../.env') });
@@ -11,13 +12,20 @@ dotenv.config({ path: resolve(__dirname, '../.env') });
 let url = process.env.DATABASE_URL;
 const authToken = process.env.DATABASE_AUTH_TOKEN;
 
+// データディレクトリの確認と作成
+const dataDir = resolve(__dirname, 'data');
+if (!existsSync(dataDir)) {
+  console.log(`データディレクトリが存在しません。作成します: ${dataDir}`);
+  mkdirSync(dataDir, { recursive: true });
+}
+
 // データベースの種類を検出
 const isTurso = url?.startsWith('libsql://');
 const isSQLite = url?.startsWith('file:') || url?.startsWith('sqlite:');
 
 console.log('データベース接続情報:');
 console.log(`- タイプ: ${isTurso ? 'Turso' : isSQLite ? 'SQLite' : '不明'}`);
-console.log(`- URL: ${url || 'なし'}`);
+console.log(`- 元のURL: ${url || 'なし'}`);
 console.log(`- 認証トークン: ${authToken ? '設定済み' : '未設定'}`);
 
 // LibSQL接続設定の型定義
@@ -27,24 +35,43 @@ interface LibSQLConnectionConfig {
 }
 
 // SQLiteファイルパスの修正
-if (isSQLite && url && url.startsWith('sqlite:')) {
-  // SQLiteファイルのパスを作成
-  const dbName = url.replace('sqlite:', '');
-  const dbDir = resolve(__dirname, '../');
-  const dbPath = resolve(dbDir, dbName);
+if (isSQLite && url) {
+  let dbPath = '';
+  
+  if (url.startsWith('sqlite:')) {
+    // SQLiteファイルのパスを作成
+    const dbName = url.replace('sqlite:', '');
+    dbPath = resolve(__dirname, dbName);
+  } else if (url.startsWith('file:')) {
+    // file:から始まるURLの場合
+    const dbName = url.replace('file:', '').replace('./', '');
+    
+    // ./で始まる相対パスの処理
+    if (url.includes('./')) {
+      dbPath = resolve(__dirname, dbName);
+    } else {
+      // 絶対パスまたは相対パスの処理
+      if (dbName.startsWith('/')) {
+        dbPath = dbName; // 絶対パス
+      } else {
+        // dev-test.dbのような単純なファイル名の場合はdataディレクトリに配置
+        dbPath = resolve(dataDir, dbName);
+      }
+    }
+  }
 
-  // ファイルが存在するか確認
-  console.log('データベースパス:', dbPath);
-
-  // SQLiteの接続URLを設定
+  // 最終的なURLを設定
   url = `file:${dbPath}`;
+  console.log(`- 解決されたパス: ${dbPath}`);
+  console.log(`- 最終的なURL: ${url}`);
+  
+  // パス情報を出力（デバッグ用）
+  console.log('データディレクトリパス:', dataDir);
 }
 
 if (!url) {
   throw new Error('DATABASE_URLが設定されていません');
 }
-
-console.log('Database URL:', url);
 
 async function runMigration() {
   try {
