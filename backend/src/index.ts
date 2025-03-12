@@ -11,7 +11,7 @@ const app = new Hono();
 // フロントエンドのURLを環境変数から取得
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 // CORS許可オリジンリストを環境変数から取得（カンマ区切り）
-const corsAllowedOrigins = process.env.CORS_ALLOWED_ORIGINS 
+const corsAllowedOrigins = process.env.CORS_ALLOWED_ORIGINS
   ? process.env.CORS_ALLOWED_ORIGINS.split(',')
   : [];
 
@@ -22,7 +22,7 @@ const defaultAllowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   // Docker開発環境向け
-  'http://frontend:5173'
+  'http://frontend:5173',
 ];
 
 // 両方のリストを結合して重複を削除
