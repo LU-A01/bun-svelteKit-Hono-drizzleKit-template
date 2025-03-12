@@ -14,7 +14,11 @@
     "test": "npm run test:unit -- --run && npm run test:e2e",
     "test:e2e": "playwright test",
     "lint": "bunx @biomejs/biome check .",
-    "format": "bunx @biomejs/biome format --write ."
+    "lint:fix": "bunx @biomejs/biome check --apply .",
+    "format": "bunx @biomejs/biome format --write .",
+    "biome:check": "bunx @biomejs/biome check .",
+    "biome:lint": "bunx @biomejs/biome lint .",
+    "biome:format": "bunx @biomejs/biome format --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",

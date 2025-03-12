@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { IdSchema } from "./index";
+import { z } from 'zod';
+import { IdSchema } from './index';
 
 export const TodoSchema = z.object({
   id: IdSchema,

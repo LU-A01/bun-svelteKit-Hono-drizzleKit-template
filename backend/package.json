@@ -10,7 +10,11 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "bunx @biomejs/biome check .",
-    "format": "bunx @biomejs/biome format --write ."
+    "lint:fix": "bunx @biomejs/biome check --apply .",
+    "format": "bunx @biomejs/biome format --write .",
+    "biome:check": "bunx @biomejs/biome check .",
+    "biome:lint": "bunx @biomejs/biome lint .",
+    "biome:format": "bunx @biomejs/biome format --write ."
   },
   "dependencies": {
     "@hono/node-server": "latest",

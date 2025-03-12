@@ -2,7 +2,16 @@
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "extends": ["../biome.json"],
   "files": {
-    "ignore": ["node_modules", "dist", "build", "coverage", ".turbo", ".bun"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "build",
+      "coverage",
+      ".turbo",
+      ".bun",
+      "migrations",
+      "drizzle"
+    ]
   },
   "linter": {
     "rules": {
@@ -11,9 +20,6 @@
       },
       "suspicious": {
         "noExplicitAny": "warn"
-      },
-      "correctness": {
-        "noUnusedVariables": "warn"
       }
     }
   }

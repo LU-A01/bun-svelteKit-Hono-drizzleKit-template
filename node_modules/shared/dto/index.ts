@@ -5,4 +5,4 @@ export interface BaseDto {
   id?: string;
 }
 
-export * from "./todo";
+export * from './todo';

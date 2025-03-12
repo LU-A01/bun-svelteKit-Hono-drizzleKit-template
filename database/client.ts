@@ -1,7 +1,7 @@
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import * as schema from "./schema";
-import * as dotenv from "dotenv";
+import { createClient } from '@libsql/client';
+import * as dotenv from 'dotenv';
+import { drizzle } from 'drizzle-orm/libsql';
+import * as schema from './schema';
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ const url = process.env.DATABASE_URL;
 const authToken = process.env.DATABASE_AUTH_TOKEN;
 
 if (!url) {
-  throw new Error("DATABASE_URLが設定されていません");
+  throw new Error('DATABASE_URLが設定されていません');
 }
 
 // LibSQLクライアントの作成

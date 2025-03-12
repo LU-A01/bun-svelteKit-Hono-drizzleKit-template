@@ -19,7 +19,9 @@
     "format": "turbo run format",
     "db:migrate": "cd database && bun run migrate",
     "db:studio": "cd database && bun run studio",
-    "biome:check": "bunx @biomejs/biome check --apply .",
+    "biome:check": "bunx @biomejs/biome check .",
+    "biome:check:apply": "bunx @biomejs/biome check --apply .",
+    "biome:lint": "bunx @biomejs/biome lint .",
     "biome:format": "bunx @biomejs/biome format --write .",
     "clean": "rm -rf node_modules/.cache bun.lockb **/bun.lock* && bun install",
     "clean:windows": "if (Test-Path node_modules/.cache) { Remove-Item -Recurse -Force node_modules/.cache }; Get-ChildItem -Recurse -Filter bun.lock* | Remove-Item -Force; bun install --force"
@@ -28,7 +30,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.4.1",
+    "@biomejs/biome": "1.9.4",
     "turbo": "2.0.1",
     "typescript": "5.3.3"
   },

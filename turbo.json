@@ -5,11 +5,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".svelte-kit/**"]
-    },
-    "lint": {
-      "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": ["dist/**", ".svelte-kit/**", "build/**"]
     },
     "dev": {
       "dependsOn": [],
@@ -19,9 +15,21 @@
     },
     "test": {
       "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
       "outputs": []
     },
     "format": {
+      "outputs": []
+    },
+    "biome:check": {
+      "outputs": []
+    },
+    "biome:format": {
+      "outputs": []
+    },
+    "biome:lint": {
       "outputs": []
     },
     "clean": {

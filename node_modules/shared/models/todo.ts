@@ -1,7 +1,7 @@
-import { BaseModel } from "./index";
+import { BaseModel } from './index';
 
 // 基本的なTodoモデル（フロントエンド用）
-export interface Todo extends Omit<BaseModel, "createdAt" | "updatedAt"> {
+export interface Todo extends Omit<BaseModel, 'createdAt' | 'updatedAt'> {
   title: string;
   completed: boolean;
   createdAt: string | Date;

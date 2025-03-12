@@ -17,7 +17,11 @@
     "dev": "echo 'No dev server for shared'",
     "test": "echo 'No tests for shared yet'",
     "lint": "bunx @biomejs/biome check .",
-    "format": "bunx @biomejs/biome format --write ."
+    "lint:fix": "bunx @biomejs/biome check --apply .",
+    "format": "bunx @biomejs/biome format --write .",
+    "biome:check": "bunx @biomejs/biome check .",
+    "biome:lint": "bunx @biomejs/biome lint .",
+    "biome:format": "bunx @biomejs/biome format --write ."
   },
   "dependencies": {
     "zod": "3.22.4"

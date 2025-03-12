@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-import type { Todo } from "../../domain/todo/entity";
-import type { TodoRepository } from "../../domain/todo/repository";
-import type { CreateTodoDto, UpdateTodoDto } from "@shared/dto/todo";
+import type { CreateTodoDto, UpdateTodoDto } from '@shared/dto/todo';
+import { v4 as uuidv4 } from 'uuid';
+import type { Todo } from '../../domain/todo/entity';
+import type { TodoRepository } from '../../domain/todo/repository';
 
 // メモリ内にデータを保存するリポジトリ
 export class TodoMemoryRepository implements TodoRepository {
@@ -11,25 +11,25 @@ export class TodoMemoryRepository implements TodoRepository {
     // 初期データを追加
     this.todos.push(
       {
-        id: "1",
-        title: "メモリ用サンプルタスク1",
+        id: '1',
+        title: 'メモリ用サンプルタスク1',
         completed: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
-        id: "2",
-        title: "メモリ用サンプルタスク2",
+        id: '2',
+        title: 'メモリ用サンプルタスク2',
         completed: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
     );
-    console.log("メモリリポジトリを初期化しました");
+    console.log('メモリリポジトリを初期化しました');
   }
 
   async findAll(): Promise<Todo[]> {
-    console.log("メモリからすべてのTODOを取得します", this.todos.length);
+    console.log('メモリからすべてのTODOを取得します', this.todos.length);
     return [...this.todos];
   }
 
@@ -73,4 +73,4 @@ export class TodoMemoryRepository implements TodoRepository {
     this.todos = this.todos.filter((t) => t.id !== id);
     return this.todos.length !== initialLength;
   }
-} 
+}

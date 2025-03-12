@@ -7,4 +7,4 @@ export interface BaseModel {
   updatedAt: Date;
 }
 
-export * from "./todo";
+export * from './todo';

@@ -1,31 +1,34 @@
-import { eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
-import type { Todo } from "../../domain/todo/entity";
-import type { TodoRepository } from "../../domain/todo/repository";
-import type { CreateTodoDto, UpdateTodoDto } from "@shared/dto/todo";
-import { db } from "../db/client";
-import { todos } from "../db/schema";
-import { type LibSQLDatabase } from "drizzle-orm/libsql";
+import type { CreateTodoDto, UpdateTodoDto } from '@shared/dto/todo';
+import { eq } from 'drizzle-orm';
+import { type LibSQLDatabase } from 'drizzle-orm/libsql';
+import { v4 as uuidv4 } from 'uuid';
+import type { Todo } from '../../domain/todo/entity';
+import type { TodoRepository } from '../../domain/todo/repository';
+import { db } from '../db/client';
+import { todos } from '../db/schema';
+
+// スキーマから得られるデータベースレコードの型を定義
+type TodoRecord = typeof todos.$inferSelect;
 
 export class TodoTursoRepository implements TodoRepository {
   constructor() {
-    console.log("TodoTursoRepositoryを初期化しています...");
+    console.log('TodoTursoRepositoryを初期化しています...');
     if (!db) {
-      throw new Error("データベース接続が初期化されていません");
+      throw new Error('データベース接続が初期化されていません');
     }
   }
 
   async findAll(): Promise<Todo[]> {
     try {
-      console.log("Tursoデータベースからすべてのタスクを取得します");
+      console.log('Tursoデータベースからすべてのタスクを取得します');
       const result = await db.select().from(todos);
       console.log(`取得したタスク数: ${result.length}`);
       return result.map(this.mapToEntity);
     } catch (error) {
-      console.error("データベースからのTODO取得エラー:", error);
-      console.error("エラーの詳細:", (error as Error).message);
-      console.error("スタックトレース:", (error as Error).stack);
-      throw new Error("TODOの取得に失敗しました");
+      console.error('データベースからのTODO取得エラー:', error);
+      console.error('エラーの詳細:', (error as Error).message);
+      console.error('スタックトレース:', (error as Error).stack);
+      throw new Error('TODOの取得に失敗しました');
     }
   }
 
@@ -37,14 +40,14 @@ export class TodoTursoRepository implements TodoRepository {
       return result.length > 0 ? this.mapToEntity(result[0]) : null;
     } catch (error) {
       console.error(`ID: ${id} のTODO取得エラー:`, error);
-      console.error("エラーの詳細:", (error as Error).message);
-      throw new Error("TODOの取得に失敗しました");
+      console.error('エラーの詳細:', (error as Error).message);
+      throw new Error('TODOの取得に失敗しました');
     }
   }
 
   async create(data: CreateTodoDto): Promise<Todo> {
     try {
-      console.log("Tursoデータベースに新しいタスクを作成します", data);
+      console.log('Tursoデータベースに新しいタスクを作成します', data);
       const id = uuidv4();
       const now = new Date().toISOString();
 
@@ -56,7 +59,7 @@ export class TodoTursoRepository implements TodoRepository {
         updatedAt: now,
       };
 
-      console.log("Tursoデータベースに挿入するタスク:", newTodo);
+      console.log('Tursoデータベースに挿入するタスク:', newTodo);
       await db.insert(todos).values({
         id: newTodo.id,
         title: newTodo.title,
@@ -65,12 +68,12 @@ export class TodoTursoRepository implements TodoRepository {
         updatedAt: newTodo.updatedAt,
       });
 
-      console.log("タスクが正常に作成されました ID:", id);
+      console.log('タスクが正常に作成されました ID:', id);
       return newTodo;
     } catch (error) {
-      console.error("TODO作成エラー:", error);
-      console.error("エラーの詳細:", (error as Error).message);
-      throw new Error("TODOの作成に失敗しました");
+      console.error('TODO作成エラー:', error);
+      console.error('エラーの詳細:', (error as Error).message);
+      throw new Error('TODOの作成に失敗しました');
     }
   }
 
@@ -88,7 +91,7 @@ export class TodoTursoRepository implements TodoRepository {
         updatedAt: new Date().toISOString(),
       };
 
-      console.log("更新するデータ:", updatedData);
+      console.log('更新するデータ:', updatedData);
       await db.update(todos).set(updatedData).where(eq(todos.id, id));
 
       console.log(`タスク ID: ${id} が正常に更新されました`);
@@ -99,8 +102,8 @@ export class TodoTursoRepository implements TodoRepository {
       };
     } catch (error) {
       console.error(`ID: ${id} のTODO更新エラー:`, error);
-      console.error("エラーの詳細:", (error as Error).message);
-      throw new Error("TODOの更新に失敗しました");
+      console.error('エラーの詳細:', (error as Error).message);
+      throw new Error('TODOの更新に失敗しました');
     }
   }
 
@@ -112,13 +115,13 @@ export class TodoTursoRepository implements TodoRepository {
       return true; // 削除が成功したと見なす
     } catch (error) {
       console.error(`ID: ${id} のTODO削除エラー:`, error);
-      console.error("エラーの詳細:", (error as Error).message);
-      throw new Error("TODOの削除に失敗しました");
+      console.error('エラーの詳細:', (error as Error).message);
+      throw new Error('TODOの削除に失敗しました');
     }
   }
 
   // データベースの結果をドメインエンティティにマッピング
-  private mapToEntity(data: any): Todo {
+  private mapToEntity(data: TodoRecord): Todo {
     return {
       id: data.id,
       title: data.title,

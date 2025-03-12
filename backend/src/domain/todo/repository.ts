@@ -1,5 +1,5 @@
-import type { Todo } from "./entity";
-import type { CreateTodoDto, UpdateTodoDto } from "@shared/dto/todo";
+import type { CreateTodoDto, UpdateTodoDto } from '@shared/dto/todo';
+import type { Todo } from './entity';
 
 export interface TodoRepository {
   findAll(): Promise<Todo[]>;

@@ -1,6 +1,6 @@
-import adapter from "@sveltejs/adapter-auto";
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
-import { resolve } from "path";
+import { resolve } from 'path';
+import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,7 +16,7 @@ const config = {
 
     // パスエイリアスの設定
     alias: {
-      "@shared": resolve("./..", "shared"),
+      '@shared': resolve('./..', 'shared'),
     },
   },
 };
