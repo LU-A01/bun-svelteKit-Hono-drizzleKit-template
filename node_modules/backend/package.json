@@ -36,7 +36,5 @@
     "typescript": "5.3.3",
     "vitest": "latest"
   },
-  "trustedDependencies": [
-    "@biomejs/biome"
-  ]
+  "trustedDependencies": ["@biomejs/biome"]
 }

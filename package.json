@@ -4,12 +4,7 @@
   "private": true,
   "type": "module",
   "packageManager": "bun@1.2.4",
-  "workspaces": [
-    "frontend",
-    "backend",
-    "database",
-    "shared"
-  ],
+  "workspaces": ["frontend", "backend", "database", "shared"],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",

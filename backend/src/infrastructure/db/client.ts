@@ -1,9 +1,10 @@
-import * as fs from 'fs';
-import { resolve } from 'path';
+import * as fs from 'node:fs';
+import { resolve } from 'node:path';
 import { createClient } from '@libsql/client';
+import type { Client } from '@libsql/client';
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';
-import { type LibSQLDatabase } from 'drizzle-orm/libsql';
+import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 import { createTablesQuery } from './schema';
 
@@ -21,7 +22,7 @@ interface LibSQLConnectionConfig {
 }
 
 // データベース接続とクライアントの初期化
-let client;
+let client: Client;
 let db: LibSQLDatabase<typeof schema>;
 
 try {

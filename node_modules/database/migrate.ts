@@ -1,5 +1,4 @@
-import * as fs from 'fs';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { createClient } from '@libsql/client';
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';

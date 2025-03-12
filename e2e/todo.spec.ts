@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Todo App', () => {
   test.beforeEach(async ({ page }) => {
@@ -54,4 +54,4 @@ test.describe('Todo App', () => {
     // 再びTodoが表示されていることを確認
     await expect(page.locator('text=フィルターテスト用のタスク')).toBeVisible();
   });
-}); 
+});

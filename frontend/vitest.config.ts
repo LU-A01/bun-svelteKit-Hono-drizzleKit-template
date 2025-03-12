@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config';
+import { resolve } from 'node:path';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { resolve } from 'path';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [
@@ -8,8 +8,8 @@ export default defineConfig({
       hot: !process.env.VITEST,
       compilerOptions: {
         runes: true,
-      }
-    })
+      },
+    }),
   ],
   test: {
     globals: true,
@@ -35,6 +35,6 @@ export default defineConfig({
       $lib: resolve('./src/lib'),
       '@shared': resolve('../shared'),
     },
-    conditions: ['browser']
-  }
-}); 
+    conditions: ['browser'],
+  },
+});

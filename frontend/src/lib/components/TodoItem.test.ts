@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/svelte';
+import { fireEvent, render } from '@testing-library/svelte';
+import { describe, expect, it, vi } from 'vitest';
 import TodoItem from './TodoItem.svelte';
 
 describe('TodoItem', () => {
@@ -8,14 +8,14 @@ describe('TodoItem', () => {
     title: 'テストタスク',
     completed: false,
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   it('should render the todo title', async () => {
     const { getByText } = render(TodoItem, {
       props: {
-        todo: mockTodo
-      }
+        todo: mockTodo,
+      },
     });
 
     expect(getByText('テストタスク')).toBeInTheDocument();
@@ -26,8 +26,8 @@ describe('TodoItem', () => {
     const { getByRole } = render(TodoItem, {
       props: {
         todo: mockTodo,
-        onToggle
-      }
+        onToggle,
+      },
     });
 
     const checkbox = getByRole('checkbox');
@@ -41,8 +41,8 @@ describe('TodoItem', () => {
     const { getByLabelText } = render(TodoItem, {
       props: {
         todo: mockTodo,
-        onDelete
-      }
+        onDelete,
+      },
     });
 
     const deleteButton = getByLabelText('タスクを削除');
@@ -54,16 +54,16 @@ describe('TodoItem', () => {
   it('should show completed style when todo is completed', () => {
     const completedTodo = {
       ...mockTodo,
-      completed: true
+      completed: true,
     };
 
     const { getByText } = render(TodoItem, {
       props: {
-        todo: completedTodo
-      }
+        todo: completedTodo,
+      },
     });
 
     const titleElement = getByText('テストタスク');
     expect(titleElement).toHaveClass('line-through');
   });
-}); 
+});

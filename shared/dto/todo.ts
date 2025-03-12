@@ -1,4 +1,4 @@
-import { BaseDto } from './index';
+import type { BaseDto } from './index';
 
 export interface TodoDto extends BaseDto {
   title: string;

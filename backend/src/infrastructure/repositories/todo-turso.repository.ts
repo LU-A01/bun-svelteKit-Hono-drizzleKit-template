@@ -1,6 +1,5 @@
 import type { CreateTodoDto, UpdateTodoDto } from '@shared/dto/todo';
 import { eq } from 'drizzle-orm';
-import { type LibSQLDatabase } from 'drizzle-orm/libsql';
 import { v4 as uuidv4 } from 'uuid';
 import type { Todo } from '../../domain/todo/entity';
 import type { TodoRepository } from '../../domain/todo/repository';
