@@ -11,6 +11,7 @@
     type = "button",
     icon = "",
     children,
+    onClick,
     ...props
   } = $props<{
     variant?: Variant;
@@ -19,12 +20,13 @@
     type?: "button" | "submit" | "reset";
     icon?: string;
     children?: any;
+    onClick?: () => void;
   }>();
 
   const dispatch = createEventDispatcher();
   
   function handleClick() {
-    dispatch('click');
+    if (onClick) onClick();
   }
 
   // Variants
@@ -53,7 +55,7 @@
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0d99ff] focus-visible:ring-offset-2 
   disabled:pointer-events-none disabled:opacity-50 
   ${variants[variant as Variant]} ${sizes[size as Size]} ${className}`}
-  on:click={handleClick}
+  onclick={handleClick}
   {...props}
 >
   {#if icon}

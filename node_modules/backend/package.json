@@ -32,6 +32,7 @@
     "@types/uuid": "latest",
     "bun-types": "latest",
     "drizzle-kit": "latest",
+    "supertest": "^7.0.0",
     "typescript": "5.3.3",
     "vitest": "latest"
   },

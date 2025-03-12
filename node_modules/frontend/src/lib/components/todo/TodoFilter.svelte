@@ -31,7 +31,7 @@
           ? "bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]"
           : "text-theme-secondary hover:bg-[var(--color-bg-button-hover)]"
       }`}
-      on:click={setAll}
+      onclick={setAll}
     >
       <span>🔍</span> すべて
     </button>
@@ -41,7 +41,7 @@
           ? "bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]"
           : "text-theme-secondary hover:bg-[var(--color-bg-button-hover)]"
       }`}
-      on:click={setActive}
+      onclick={setActive}
     >
       <span>⌛</span> 未完了
     </button>
@@ -51,7 +51,7 @@
           ? "bg-theme-accent text-white hover:bg-[var(--color-bg-accent-hover)]"
           : "text-theme-secondary hover:bg-[var(--color-bg-button-hover)]"
       }`}
-      on:click={setCompleted}
+      onclick={setCompleted}
     >
       <span>✓</span> 完了済み
     </button>

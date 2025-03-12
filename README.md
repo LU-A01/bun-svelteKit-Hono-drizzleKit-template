@@ -66,6 +66,42 @@ A monorepo template for web application development using Bun. This template ado
 
 > format:code changes → lint → Unit Test → Integrated Test → E2E Test → Build → Deploy
 
+## 🧪 Testing
+
+The project includes a comprehensive test suite for both frontend and backend:
+
+```bash
+# Run all tests (backend and frontend)
+bun run test:all
+
+# Run only backend tests
+bun run test:backend
+
+# Run only frontend tests
+bun run test:frontend
+
+# Run E2E tests
+bun run test:e2e
+
+# Run tests with coverage
+bun run test:coverage
+```
+
+### Test Features
+
+- **API Mocking**: Frontend tests automatically mock API requests, eliminating the need to run the backend during testing
+- **Component Testing**: Tests for individual UI components using `@testing-library/svelte`
+- **Backend Testing**: Tests for API routes and controllers using Hono's testing utilities
+- **E2E Testing**: End-to-end tests using Playwright
+
+### Troubleshooting Tests
+
+If tests fail with warnings about deprecated Svelte event handlers, ensure that:
+
+1. All `on:event` directives have been updated to Svelte 5's new `onevent` attribute format
+2. Components have proper accessibility attributes (tabindex, ARIA roles, keyboard handlers)
+3. The mocked API responses match the expected data structure
+
 ## 🏁 Getting Started
 
 ### Prerequisites

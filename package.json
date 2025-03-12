@@ -15,6 +15,13 @@
     "build": "turbo run build",
     "start": "cd backend && bun run start",
     "test": "turbo run test",
+    "test:e2e": "playwright test",
+    "test:unit": "turbo run test:unit",
+    "test:coverage": "turbo run test:coverage",
+    "test:watch": "turbo run test:watch",
+    "test:backend": "cd backend && bun run test",
+    "test:frontend": "cd frontend && bun run test:unit",
+    "test:all": "bun run test:backend && bun run test:frontend",
     "lint": "turbo run lint",
     "format": "turbo run format",
     "db:migrate": "cd database && bun run migrate",
@@ -31,8 +38,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@playwright/test": "^1.51.0",
+    "@vitest/coverage-v8": "^3.0.8",
     "turbo": "2.0.1",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "vitest": "^3.0.8"
   },
   "engines": {
     "bun": ">=1.0.0",
